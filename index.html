@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blade Digital — Caught in the Net</title>
+<meta name="description" content="Harmless fishing-themed prank page.">
+<style>
+  :root{
+    --bg:#000;
+    --cyan:#0ff;
+    --mag:#f0f;
+    --white:#eaffff;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{
+    background:var(--bg);
+    color:var(--cyan);
+    font:16px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    overflow:hidden;
+  }
+  /* Matrix canvas */
+  #matrix{position:fixed; inset:0; z-index:0; background:#000;}
+  .wrap{
+    position:relative; z-index:1;
+    height:100%; display:flex; align-items:center; justify-content:center;
+    text-align:center; padding:20px;
+  }
+  .panel{
+    max-width:800px; width:clamp(280px, 90vw, 820px);
+    border:1px solid #033; border-radius:16px;
+    background:linear-gradient(180deg, rgba(0,30,30,.35), rgba(0,0,0,.7));
+    box-shadow:0 0 30px rgba(0,255,255,.18), inset 0 0 24px rgba(0,255,255,.08);
+    padding:22px 24px;
+  }
+  .brand{
+    font-weight:900; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--white);
+    text-shadow:0 0 12px var(--cyan), 0 0 28px var(--mag), 0 0 56px var(--cyan);
+    font-size:clamp(18px, 5vw, 36px); margin-bottom:6px;
+  }
+  .headline{
+    font-size:clamp(20px, 6vw, 48px);
+    color:var(--white);
+    text-shadow:0 0 10px var(--cyan);
+    margin:12px 0 4px;
+  }
+  .sub{color:#7ff; margin:4px 0 14px;}
+  .blink{animation:blink 1s steps(2,start) infinite}
+  @keyframes blink{to{visibility:hidden}}
+  .footer{opacity:.75; font-size:.95rem; margin-top:10px}
+  .hide{display:none}
+  .btn{
+    display:inline-block; margin-top:10px;
+    padding:10px 14px; border-radius:12px; text-decoration:none;
+    color:var(--white); border:1px solid #066;
+    background:linear-gradient(90deg, rgba(0,255,255,.18), rgba(255,0,255,.18));
+    font-weight:700; letter-spacing:.05em;
+  }
+  .btn:hover{transform:translateY(-1px)}
+  /* Simple ASCII fish */
+  pre.fish{
+    margin:10px auto 0; color:#aff; text-align:left; width:fit-content;
+    text-shadow:0 0 8px var(--cyan);
+    white-space:pre; font-size:12px; line-height:1.05;
+  }
+</style>
+</head>
+<body>
+<canvas id="matrix"></canvas>
+<div class="wrap">
+  <div class="panel" id="panel">
+    <div class="brand">BLADE DIGITAL</div>
+    <div class="headline blink" id="h1">NETWORK ALERT</div>
+    <div class="sub" id="sub1">Scanning traffic…</div>
+    <pre class="fish" id="fish" aria-hidden="true">
+      ><(((°>    ><(((°>     ><(((°>
+    </pre>
+    <div class="footer" id="foot">Safe • Fun • Incognito</div>
+    <a href="#" class="btn hide" id="btnReset">Replay</a>
+  </div>
+</div>
+
+<script>
+// Matrix rain background
+(function(){
+  const canvas = document.getElementById('matrix');
+  const ctx = canvas.getContext('2d');
+  let w, h, cols, y;
+  const chars = 'アカサタナハマヤラワ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ¥§#*+<>[]{}';
+  const fontSize = 16;
+  function resize(){
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+    cols = Math.floor(w / fontSize);
+    y = new Array(cols).fill(0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+  function draw(){
+    ctx.fillStyle = 'rgba(0,0,0,0.08)';
+    ctx.fillRect(0,0,w,h);
+    ctx.fillStyle = '#0ff';
+    ctx.font = fontSize + 'px monospace';
+    for(let i=0;i<y.length;i++){
+      const text = chars[Math.floor(Math.random()*chars.length)];
+      const x = i*fontSize;
+      ctx.fillText(text, x, y[i]*fontSize);
+      if(y[i]*fontSize > h && Math.random() > 0.975) y[i] = 0; else y[i]++;
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// Message sequence
+(async function(){
+  const h1 = document.getElementById('h1');
+  const sub = document.getElementById('sub1');
+  const fish = document.getElementById('fish');
+  const foot = document.getElementById('foot');
+  const btnReset = document.getElementById('btnReset');
+
+  function wait(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+  async function play(){
+    btnReset.classList.add('hide');
+    h1.classList.add('blink');
+    fish.style.opacity = 0.9;
+    h1.textContent = 'NETWORK ALERT';
+    sub.textContent = 'Scanning traffic…';
+    foot.textContent = 'Safe • Fun • Incognito';
+
+    await wait(1200);
+    h1.classList.remove('blink');
+    h1.textContent = 'Your IP address has been caught in the net!';
+    sub.textContent = 'Reeling in packets… 🎣';
+    await wait(1600);
+    h1.classList.add('blink');
+    sub.textContent = 'Analyzing payload…';
+    await wait(1400);
+    h1.classList.remove('blink');
+    h1.textContent = 'Just kidding. Blade Digital got you.';
+    sub.textContent = 'No data collected. This is a harmless prank 🙂';
+    foot.textContent = '© Blade Digital — Stay sharp.';
+    btnReset.classList.remove('hide');
+  }
+
+  btnReset.addEventListener('click', (e)=>{ e.preventDefault(); play(); });
+  play();
+})();
+</script>
+</body>
+</html>
